@@ -1,0 +1,62 @@
+#Silver coins with Augustan inscriptions
+PREFIX crm: <http://erlangen-crm.org/current/>                  #Prefix for the CIDOC-CRM
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>               #Prefix for SKOS terminologies
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>                
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX bmo: <http://collection.britishmuseum.org/id/ontology/>    #British Museum Ontology PX_
+PREFIX fts: <http://www.ontotext.com/owlim/fts#>                #OWLIM Fast Text serach
+
+SELECT
+
+?object                        #Object URI
+?metal                         #Metal name
+?objectphy                     #Object physical Description (sub property of P2_has_note)
+?inscriptext                   #Inscription text
+?startdate                     #xsd start date for range
+?enddate                       #xsd end date for range
+?comment                       #curatorial comments on the object (sub property of P2_has_note)
+
+WHERE
+{
+
+?object crm:P2_has_type ?objecttype .                        #An object has an object type
+?objecttype skos:prefLabel "coin" .                          #the object type is "coin"
+
+?object bmo:PX_physical_description ?objectphy .             #has a physical description
+?object bmo:PX_curatorial_comment  ?comment .                #has a curatorial comment 
+
+?object crm:P130_shows_features_of ?inscription .            #object has a feature
+?inscription rdf:type crm:E34_Inscription .                  #the feature is an inscription 
+?inscription rdfs:label ?inscriptext .                       #the inscription label has some text 
+
+?object crm:P45_consists_of ?materialid .                    #The object is made of a material
+?materialid skos:prefLabel ?metal .                          #The material label has some text 
+
+?object crm:P108i_was_produced_by ?production .              #The Object was produced through a production event
+?production crm:P9_consists_of ?productionpart  .            #The production event consists of parts
+?productionpart crm:P4_has_time-span ?timespandate  .        #One part describes a time span    
+?timespandate crm:P82a_begin_of_the_begin ?startdate .       #The time span has a begining date
+?timespandate crm:P82b_end_of_the_end ?enddate .             #The time span has an end date
+
+?object crm:P108i_was_produced_by ?production .              #The object was produced through a production event
+?production crm:P9_consists_of ?productionpart1  .           #The production event consists of parts
+?productionpart1 crm:P10_falls_within ?matcultureid .        #One part describes the cultural period
+?matcultureid skos:prefLabel ?period .                       #The period has a descriptive label 
+#FILTER regex(str(?period),"Roman Imperial","i")             #You can look the id up using regex
+#<Imperial:Roman:> fts:exactMatch ?period .                  #You can also do this with OWLIM FTS    
+?matcultureid skos:prefLabel "Roman Imperial" .              #You can also use the exact literal if you know it
+
+{
+FILTER (
+  (?startdate >= "-0035-01-01"^^xsd:date) 
+    &&    
+  (?enddate <= "-0010-12-31"^^xsd:date)
+
+)}                                                                              
+
+FILTER (regex(?inscriptext, "AVGVST","i"))                   #the inscription contains the text AVGVST (Augustus)
+
+FILTER (regex(?metal, "Silver","i"))                           #the coin contains copper 
+
+}
