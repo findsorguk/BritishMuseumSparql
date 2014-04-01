@@ -103,3 +103,31 @@ where
 FILTER( ?national = <http://collection.britishmuseum.org/id/thesauri/nationality/Greek> ) . 
 FILTER( ?birthdate <= "1000-01-01"^^xsd:date ) .
 }
+
+#Find Augustus only
+PREFIX crm: <http://erlangen-crm.org/current/>
+PREFIX fts: <http://www.ontotext.com/owlim/fts#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX bmo: <http://collection.britishmuseum.org/id/ontology/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+SELECT DISTINCT ?person ?name ?birthdate ?nationality ?profession ?gender
+
+where
+{
+?person skos:inScheme <http://collection.britishmuseum.org/id/person-institution> .
+?person crm:P98i_was_born ?birth .
+?birth crm:P4_has_time-span ?date .
+?date crm:P82a_begin_of_the_begin ?birthdate .
+?person crm:P131_is_identified_by ?appellation .
+?person bmo:PX_nationality ?national .
+?national skos:prefLabel ?nationality .
+?appellation rdfs:label ?name .   
+?person bmo:PX_profession ?profession .
+?person bmo:PX_gender ?gender .  
+FILTER(?national = <http://collection.britishmuseum.org/id/thesauri/nationality/Roman>) . 
+FILTER(?birthdate <= "1000-01-01"^^xsd:date) .
+FILTER(?profession = <http://collection.britishmuseum.org/id/thesauri/profession/ruler> ) .
+FILTER( ?name = "Augustus" ) .
+}
