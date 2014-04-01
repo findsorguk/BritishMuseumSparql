@@ -1,3 +1,5 @@
+#These queries were for the SnapDrgn workshop at KCL. 
+#Use the BM collection endpoint at http://collection.britishmuseum.org/sparql
 #Extract people born before AD 10
 
 PREFIX crm: <http://erlangen-crm.org/current/>
