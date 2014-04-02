@@ -1,0 +1,36 @@
+PREFIX rdf:	<http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX dcterms:	<http://purl.org/dc/terms/>
+PREFIX skos:	<http://www.w3.org/2004/02/skos/core#>
+PREFIX owl:	<http://www.w3.org/2002/07/owl#>
+PREFIX foaf:	<http://xmlns.com/foaf/0.1/>
+PREFIX ecrm:	<http://erlangen-crm.org/current/>
+PREFIX geo:	<http://www.w3.org/2003/01/geo/wgs84_pos#>
+PREFIX nm:	<http://nomisma.org/id/>
+PREFIX xsd:	<http://www.w3.org/2001/XMLSchema#>
+
+ 
+SELECT DISTINCT
+
+?label  ?start ?end ?issuer ?denomination ?obverseDescription ?obverseLegend ?reverseDescription ?reverseLegend
+
+WHERE {
+  ?type a nm:type_series_item .
+  ?type dcterms:isPartOf <http://nomisma.org/id/ric> .  
+  ?type skos:prefLabel ?label .
+  OPTIONAL { ?type nm:start_date ?start . }
+  OPTIONAL { ?type nm:end_date ?end . }
+  OPTIONAL { ?type nm:authority ?issue . }
+  OPTIONAL { ?issue skos:prefLabel ?issuer . }  
+  OPTIONAL { ?type nm:denomination ?denom . }
+  OPTIONAL {?denom skos:prefLabel ?denomination .}
+  ?type nm:obverse ?obverse .
+  ?obverse nm:description ?obverseDescription .
+  ?obverse nm:legend ?obverseLegend .
+  ?type skos:definition ?definition .
+  ?type nm:reverse ?reverse .
+  ?reverse nm:legend ?reverseLegend .
+  ?reverse nm:description ?reverseDescription .
+FILTER (lang(?denomination) = 'en') 
+FILTER (lang(?issuer) = 'en') 
+}	
+LIMIT 5
