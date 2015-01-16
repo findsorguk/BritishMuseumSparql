@@ -1,0 +1,22 @@
+# This properly handles multivalue fields (profesion, nationality, otherNames) that the original query doesn't
+# CAREFUL: this is an expensive query that causes Stack Overflow on BM's endpoint.
+# I got the data from a local OWLIM 6.1 installation, download it from
+# https://meta.wikimedia.org/wiki/Talk:Mix%27n%27match#British_Museum_person-institution_thesaurus
+
+select ?x ?name ?otherNames ?type ?gender ?profession ?nationality ?birthDate ?deathDate ?birthPlace ?deathPlace ?note {
+  ?x skos:inScheme id:person-institution. 
+  {select ?x ?name (group_concat(?other; separator="; ") as ?otherNames)
+    {?x skos:inScheme id:person-institution; skos:prefLabel ?name.
+      optional {?x ecrm:P131_is_identified_by/rdfs:label ?other filter(?other != ?name)}}
+    group by ?x ?name}
+  optional {?x a ?type1 filter(?type1 in (ecrm:E21_Person, ecrm:E74_Group)). bind(strafter(str(?type1),"_") as ?type)}
+  optional {?x bmo:PX_gender ?gender1. bind(strafter(str(?gender1),"gender/") as ?gender)}
+  optional {select ?x (group_concat(?prof1; separator="; ") as ?profession)
+    {?x skos:inScheme id:person-institution; bmo:PX_profession/rdfs:label ?prof1} group by ?x}
+  optional {select ?x (group_concat(?nation1; separator="; ") as ?nationality)
+    {?x skos:inScheme id:person-institution; bmo:PX_nationality/skos:prefLabel ?nation1} group by ?x}
+  optional {?x ecrm:P98_brought_into_life/ecrm:P4_has_time-span/ecrm:P82a_begin_of_the_begin ?birthDate}
+  optional {?x ecrm:P98_brought_into_life/ecrm:P7_took_place_at/rdfs:label ?birthPlace}
+  optional {?x ecrm:P100_died_in/ecrm:P4_has_time-span/ecrm:P82a_begin_of_the_begin ?deathDate}
+  optional {?x ecrm:P100_died_in/ecrm:P7_took_place_at/rdfs:label ?deathPlace}
+  optional {?x ecrm:P3_has_note ?note}}
