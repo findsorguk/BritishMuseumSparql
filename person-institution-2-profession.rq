@@ -1,0 +1,5 @@
+prefix ecrm: <http://erlangen-crm.org/current/>
+select ?x (group_concat(?prof1; separator="; ") as ?profession) {
+  ?x skos:inScheme id:person-institution; bmo:PX_profession [rdfs:label ?prof1]
+} group by ?x
+

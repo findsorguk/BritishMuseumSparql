@@ -1,0 +1,5 @@
+prefix ecrm: <http://erlangen-crm.org/current/>
+select ?x (group_concat(?death1; separator="; ") as ?death) {
+  ?x skos:inScheme id:person-institution; ecrm:P93i_was_taken_out_of_existence_by [ecrm:P4_has_time-span [rdfs:label ?death1]]
+} group by ?x
+  

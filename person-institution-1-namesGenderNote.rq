@@ -1,0 +1,14 @@
+prefix ecrm: <http://erlangen-crm.org/current/>
+select ?x ?name ?otherNames ?type ?gender ?note {
+  ?x skos:inScheme id:person-institution.
+  {select ?x ?name (group_concat(?other; separator="; ") as ?otherNames)
+    {?x skos:inScheme id:person-institution; skos:prefLabel ?name.
+      optional {?x ecrm:P131_is_identified_by/rdfs:label ?other filter(?other != ?name)}}
+    group by ?x ?name}
+  bind(if(exists{?x a ecrm:E21_Person},"Person","") as ?type)
+  optional {?x bmo:PX_gender ?gender1.
+    bind(strafter(str(?gender1),"gender/") as ?gender2) 
+    bind(if(?gender2="m","male",?gender2) as ?gender)}
+  optional {?x ecrm:P3_has_note ?note}
+}
+  
