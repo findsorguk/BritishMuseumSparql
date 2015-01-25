@@ -1,0 +1,5 @@
+prefix ecrm: <http://erlangen-crm.org/current/>
+select ?x (group_concat(?nation1; separator="; ") as ?nationality) {
+  ?x skos:inScheme id:person-institution; bmo:PX_nationality [skos:prefLabel ?nation1]
+} group by ?x
+

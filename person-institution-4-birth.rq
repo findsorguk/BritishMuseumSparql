@@ -1,0 +1,5 @@
+prefix ecrm: <http://erlangen-crm.org/current/>
+select ?x (group_concat(?birth1; separator="; ") as ?birth) {
+  ?x skos:inScheme id:person-institution; ecrm:P92i_was_brought_into_existence_by [ecrm:P4_has_time-span [rdfs:label ?birth1]]
+} group by ?x
+
